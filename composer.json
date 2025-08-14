@@ -1,0 +1,16 @@
+{
+    "name": "jsc-php/router2",
+    "description": "My web router",
+    "license": "GPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "JscPhp\\Router2\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "James Cavaliere"
+        }
+    ],
+    "require": {}
+}
