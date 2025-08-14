@@ -2,9 +2,10 @@
 
 namespace JscPhp\Router2;
 
-class Route
+class RouteArray
 {
     public function __construct()
     {
+
     }
 }
