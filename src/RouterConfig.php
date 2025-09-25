@@ -1,43 +1,23 @@
 <?php
 
 namespace JscPhp\Router2;
-
 class RouterConfig
 {
-
-    private string $class_path;
-    private array  $search_paths;
+    private array $paths = [];
 
     public function __construct()
     {
     }
 
-    public function getClassPath(): string
+    public function addPath(string $path): void
     {
-        return $this->class_path;
+        $this->paths[] = $path;
     }
 
-    public function setClassPath(string $class_path): RouterConfig
+    public function getPaths(): array
     {
-        $this->class_path = $class_path;
-        return $this;
+        return $this->paths;
     }
 
-    public function getSearchPaths(): array
-    {
-        return $this->search_paths;
-    }
-
-    public function setSearchPaths(array $search_paths): RouterConfig
-    {
-        $this->search_paths = $search_paths;
-        return $this;
-    }
-
-    public function addSearchPath(string $search_path): RouterConfig
-    {
-        $this->search_paths[] = $search_path;
-        return $this;
-    }
 
 }
