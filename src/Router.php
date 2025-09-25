@@ -10,6 +10,7 @@ class Router
 {
     private RouterConfig    $router_config;
     private RouteCollection $route_collection;
+    private Route           $route;
 
     public function __construct(RouterConfig $router_config)
     {
@@ -34,15 +35,18 @@ class Router
                             $methods = $reflect->getMethods(\ReflectionMethod::IS_PUBLIC);
                             foreach ($methods as $method) {
                                 $attributes = $method->getAttributes(MRoute::class);
-                                foreach ($attributes as $attribute) {
-                                    $args = $attribute->getArguments();
-                                    $route = $args['route'] ?? $args[0];
-                                    $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
-                                    $priority = $args['priority'] ?? $args[2] ?? 999;
-                                    $protected = $args['protected'] ?? $args[3] ?? true;
-                                    $route = new Route($route, $class, $method->getName(), $protected);
-                                    $this->route_collection->addRoute($http_method, $route, $priority);
+                                if (!empty($attributes)) {
+                                    foreach ($attributes as $attribute) {
+                                        $args = $attribute->getArguments();
+                                        $route = $args['route'] ?? $args[0];
+                                        $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
+                                        $priority = $args['priority'] ?? $args[2] ?? 999;
+                                        $protected = $args['protected'] ?? $args[3] ?? true;
+                                        $route = new Route($route, $class, $method->getName(), $protected);
+                                        $this->route_collection->addRoute($http_method, $route, $priority);
+                                    }
                                 }
+
                             }
                         }
                     }
@@ -92,7 +96,7 @@ class Router
         return false;
     }
 
-    public function route(?string $uri = null, ?string $http_method = null, bool $return_route = false): Route|null
+    public function getRoute(?string $uri = null, ?string $http_method = null): Route|null
     {
         if (empty($uri)) {
             $uri = Request::getRequestURI(true);
@@ -100,10 +104,15 @@ class Router
         if (empty($http_method)) {
             $http_method = Request::getRequestMethod();
         }
-        $route = $this->route_collection->matchRoute($http_method, $uri);
-        if ($return_route) {
+        if ($route = $this->route_collection->matchRoute($http_method, $uri)) {
+            $this->route = $route;
             return $route;
         }
         return null;
+    }
+
+    public function go()
+    {
+
     }
 }
