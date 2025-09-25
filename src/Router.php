@@ -92,7 +92,7 @@ class Router
         return false;
     }
 
-    public function route(?string $uri = null, ?string $http_method = null): void
+    public function route(?string $uri = null, ?string $http_method = null, bool $return_route = false): Route|null
     {
         if (empty($uri)) {
             $uri = Request::getRequestURI(true);
@@ -101,6 +101,9 @@ class Router
             $http_method = Request::getRequestMethod();
         }
         $route = $this->route_collection->matchRoute($http_method, $uri);
-        var_dump($route);
+        if ($return_route) {
+            return $route;
+        }
+        return null;
     }
 }
