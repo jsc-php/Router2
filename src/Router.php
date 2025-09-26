@@ -28,10 +28,10 @@ class Router
     {
         $namespace = null;
         $class = null;
-        $contents = file_get_contents($filepath);
+        $contents = file_get_contents($filepath, length: 1000);
         $tokens = token_get_all($contents);
         $i = 0;
-        while ($i < count($tokens)) {
+        while ($i < count($tokens) && $i < 50) {
             if (is_array($tokens[$i]) && $tokens[$i][0] === T_NAMESPACE) {
                 // Find the namespace declaration
                 $i++; //Move past the T_NAMESPACE
