@@ -109,7 +109,7 @@ class RouteCollection
                     }
                 }
 
-                var_dump($namespace, $class, $c_route);
+                //var_dump($namespace, $class, $c_route);
                 fclose($handle);
                 if ($c_route) {
                     return "\\$namespace\\$class";
