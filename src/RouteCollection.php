@@ -58,6 +58,7 @@ class RouteCollection
                 foreach ($files as $file) {
                     $file_path = $file->getPathname();
                     if ($class = $this->isFileCRoute($file_path)) {
+                        include_once $file_path;
                         $reflect = new \ReflectionClass($class);
                         $c_attributes = $reflect->getAttributes(CRoute::class);
                         if (!empty($c_attributes)) {
@@ -88,14 +89,15 @@ class RouteCollection
     public function isFileCRoute(string $file_path): string|false
     {
         try {
-            $namespace = '';
-            $class = '';
+            echo "$file_path\n";
+            $namespace = null;
+            $class = null;
             if (is_readable($file_path)) {
                 $handle = fopen($file_path, 'r');
-                while (!feof($handle)) {
-                    $line = fgets($handle);
+                while ($line = fgets($handle)) {
+                    echo "$line\n";
                     if (preg_match('/^namespace\s+([^\s]+)/', $line, $matches)) {
-                        $namespace = $matches[1];
+                        $namespace = trim($matches[1], ';');
                     }
                     if (preg_match('/^class\s+([^\s]+)/', $line, $matches)) {
                         $class = $matches[1];
