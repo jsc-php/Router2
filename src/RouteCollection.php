@@ -94,7 +94,8 @@ class RouteCollection
             $c_route = false;
             if (is_readable($file_path)) {
                 $handle = fopen($file_path, 'r');
-                while ($line = fgets($handle)) {
+                $i = 0;
+                while ($line = fgets($handle) && $i < 50) {
                     if (preg_match('/^namespace\s+([^\s]+)/', $line, $matches)) {
                         $namespace = trim($matches[1], ';');
                     }
@@ -107,6 +108,7 @@ class RouteCollection
                     if (isset($namespace, $class)) {
                         break;
                     }
+                    $i++;
                 }
 
                 //var_dump($namespace, $class, $c_route);
