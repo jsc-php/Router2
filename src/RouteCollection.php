@@ -91,6 +91,7 @@ class RouteCollection
         try {
             $namespace = null;
             $class = null;
+            $c_route = false;
             if (is_readable($file_path)) {
                 $handle = fopen($file_path, 'r');
                 while ($line = fgets($handle)) {
@@ -100,12 +101,17 @@ class RouteCollection
                     if (preg_match('/^class\s+([^\s]+)/', $line, $matches)) {
                         $class = $matches[1];
                     }
+                    if (preg_match('/^#[CRoute]/', $line)) {
+                        $c_route = true;
+                    }
                     if (isset($namespace, $class)) {
-                        fclose($handle);
-                        return "\\$namespace\\$class";
+                        break;
                     }
                 }
                 fclose($handle);
+                if ($c_route) {
+                    return "\\$namespace\\$class";
+                }
             }
             return false;
         } catch (\Exception $ex) {
