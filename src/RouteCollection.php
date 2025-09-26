@@ -57,7 +57,7 @@ class RouteCollection
                 $files = new RecursiveIteratorIterator($di);
                 foreach ($files as $file) {
                     $file_path = $file->getPathname();
-                    if ($class = $this->getFQCNFromFile($file_path)) {
+                    if ($class = $this->isFileCRoute($file_path)) {
                         $reflect = new \ReflectionClass($class);
                         $c_attributes = $reflect->getAttributes(CRoute::class);
                         if (!empty($c_attributes)) {
@@ -83,6 +83,39 @@ class RouteCollection
                 }
             }
         }
+    }
+
+    public function isFileCRoute(string $file_path): string|false
+    {
+        try {
+            $namespace = '';
+            $class = '';
+            if (is_readable($file_path)) {
+                $handle = fopen($file_path, 'r');
+                while (!feof($handle)) {
+                    $line = fgets($handle);
+                    if (preg_match('/^namespace\s+([^\s]+)/', $line, $matches)) {
+                        $namespace = $matches[1];
+                    }
+                    if (preg_match('/^class\s+([^\s]+)/', $line, $matches)) {
+                        $class = $matches[1];
+                    }
+                    if (isset($namespace, $class)) {
+                        return "\\$namespace\\$class";
+                    }
+                }
+                fclose($handle);
+            }
+            return false;
+        } catch (\Exception $ex) {
+
+        }
+
+    }
+
+    public function addRoute(string $method, Route $route, int $priority = 999): void
+    {
+        $this->routes[strtoupper($method)][$priority][] = $route;
     }
 
     /**
@@ -123,10 +156,5 @@ class RouteCollection
             }
         }
         return false;
-    }
-
-    public function addRoute(string $method, Route $route, int $priority = 999): void
-    {
-        $this->routes[strtoupper($method)][$priority][] = $route;
     }
 }
