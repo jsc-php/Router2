@@ -57,7 +57,7 @@ class RouteCollection
                 $files = new RecursiveIteratorIterator($di);
                 foreach ($files as $file) {
                     $file_path = $file->getPathname();
-                    if ($class = $this->isFileCRoute($file_path)) {
+                    if ($class = $this->getCRouteNamespaceClass($file_path)) {
                         include_once $file_path;
                         $reflect = new \ReflectionClass($class);
                         $c_attributes = $reflect->getAttributes(CRoute::class);
@@ -86,7 +86,7 @@ class RouteCollection
         }
     }
 
-    public function isFileCRoute(string $file_path): string|false
+    public function getCRouteNamespaceClass(string $file_path): string|false
     {
         try {
             $namespace = null;
@@ -101,13 +101,15 @@ class RouteCollection
                     if (preg_match('/^class\s+([^\s]+)/', $line, $matches)) {
                         $class = $matches[1];
                     }
-                    if (preg_match('/^#[CRoute]/', $line)) {
+                    if (preg_match('/^#\[CRoute]/', $line)) {
                         $c_route = true;
                     }
                     if (isset($namespace, $class)) {
                         break;
                     }
                 }
+
+                var_dump($namespace, $class, $c_route);
                 fclose($handle);
                 if ($c_route) {
                     return "\\$namespace\\$class";
