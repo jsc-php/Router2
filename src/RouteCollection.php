@@ -89,13 +89,11 @@ class RouteCollection
     public function isFileCRoute(string $file_path): string|false
     {
         try {
-            echo "$file_path\n";
             $namespace = null;
             $class = null;
             if (is_readable($file_path)) {
                 $handle = fopen($file_path, 'r');
                 while ($line = fgets($handle)) {
-                    echo "$line\n";
                     if (preg_match('/^namespace\s+([^\s]+)/', $line, $matches)) {
                         $namespace = trim($matches[1], ';');
                     }
@@ -103,6 +101,7 @@ class RouteCollection
                         $class = $matches[1];
                     }
                     if (isset($namespace, $class)) {
+                        fclose($handle);
                         return "\\$namespace\\$class";
                     }
                 }
