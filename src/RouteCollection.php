@@ -33,7 +33,7 @@ class RouteCollection
         return false;
     }
 
-    public function processClassPaths(array $paths): void
+    public function processClassPaths(array $paths, int $fqcn_depth = 1000): void
     {
         foreach ($paths as $path) {
             if (is_dir($path)) {
@@ -41,7 +41,7 @@ class RouteCollection
                 $files = new RecursiveIteratorIterator($di);
                 foreach ($files as $file) {
                     $file_path = $file->getPathname();
-                    if ($class = Router::getFQCNFromFile($file_path)) {
+                    if ($class = Router::getFQCNFromFile($file_path, $fqcn_depth)) {
                         $reflect = new \ReflectionClass($class);
                         $c_attributes = $reflect->getAttributes(CRoute::class);
                         if (!empty($c_attributes)) {

@@ -13,7 +13,7 @@ class Router
         $this->router_config = $router_config;
         $this->route_collection = new RouteCollection();
         if (!empty($paths = $this->router_config->getPaths())) {
-            $this->route_collection->processClassPaths($paths);
+            $this->route_collection->processClassPaths($paths, $this->router_config->getFQCNFileDepth());
         }
     }
 
@@ -24,11 +24,11 @@ class Router
      *
      * @return string|false The FQCN of the class if found, otherwise false.
      */
-    public static function getFQCNFromFile(string $filepath): string|false
+    public static function getFQCNFromFile(string $filepath, int $length = 1000): string|false
     {
         $namespace = null;
         $class = null;
-        $contents = file_get_contents($filepath, length: 1000);
+        $contents = file_get_contents($filepath, length: $length);
         $tokens = token_get_all($contents);
         $i = 0;
         while ($i < count($tokens) && $i < 50) {
