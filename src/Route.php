@@ -8,9 +8,9 @@ class Route
     private string $route;
     private        $class;
     private        $method;
-    private array $parameters;
-    private array $parameter_values;
-    private bool $protected = false;
+    private array  $parameters;
+    private array  $parameter_values;
+    private bool   $protected = false;
 
     public function __construct(string $route, $class = '', $method = '', bool $protected = false)
     {
@@ -141,6 +141,18 @@ class Route
             return true;
         }
         return false;
+    }
+
+    public function getMethodArguments(): array
+    {
+        $ret = array();
+        if (!empty($this->parameters)) {
+            for ($i = 0; $i < count($this->parameters); $i++) {
+                $ret[$this->parameters[$i]] = $this->parameter_values[$i];
+            }
+        }
+
+        return $ret;
     }
 
 }

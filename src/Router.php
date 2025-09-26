@@ -34,6 +34,10 @@ class Router
 
     public function go()
     {
-
+        $class = $this->route->getClass();
+        $method = $this->route->getMethod();
+        $class = new $class;
+        $arguments = $this->route->getMethodArguments();
+        call_user_func_array([$class, $method], $arguments);
     }
 }

@@ -58,34 +58,24 @@ class RouteCollection
                 foreach ($files as $file) {
                     $file_path = $file->getPathname();
                     if ($class = $this->getCRouteNamespaceClass($file_path)) {
-                        include_once $file_path;
-                        $reflect = new \ReflectionClass($class);
-                        $c_attributes = $reflect->getAttributes(CRoute::class);
-                        if (!empty($c_attributes)) {
-                            $methods = $reflect->getMethods(\ReflectionMethod::IS_PUBLIC);
-                            foreach ($methods as $method) {
-                                $attributes = $method->getAttributes(MRoute::class);
-                                if (!empty($attributes)) {
-                                    foreach ($attributes as $attribute) {
-                                        $args = $attribute->getArguments();
-                                        $route = $args['route'] ?? $args[0] ?? null;
-                                        if ($route) {
-                                            $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
-                                            $priority = $args['priority'] ?? $args[2] ?? 999;
-                                            $protected = $args['protected'] ?? $args[3] ?? true;
-                                            $route = new Route($route, $class, $method->getName(), $protected);
-                                            $this->addRoute($http_method, $route, $priority);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        //include_once $file_path;
+                        $this->processClass($class);
                     }
                 }
             }
         }
     }
 
+    /**
+     * Retrieves the fully qualified class name (FQCN) of a class annotated with #[CRoute]
+     * from the given file path, including its namespace.
+     *
+     * @param string $file_path The path to the file to be analyzed.
+     *
+     * @return string|false Returns the fully qualified class name (namespace + class)
+     *                      if found and annotated with #[CRoute], or false if no such
+     *                      class or annotation is found or the file is unreadable.
+     */
     public function getCRouteNamespaceClass(string $file_path): string|false
     {
         try {
@@ -95,7 +85,8 @@ class RouteCollection
             if (is_readable($file_path)) {
                 $handle = fopen($file_path, 'r');
                 $i = 0;
-                while ($line = fgets($handle) && $i < 50) {
+                while (($line = fgets($handle)) && ($i < 50)) {
+
                     if (preg_match('/^namespace\s+([^\s]+)/', $line, $matches)) {
                         $namespace = trim($matches[1], ';');
                     }
@@ -124,48 +115,40 @@ class RouteCollection
 
     }
 
+    /**
+     * @param string $class
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function processClass(string $class): void
+    {
+        $reflect = new \ReflectionClass($class);
+        $c_attributes = $reflect->getAttributes(CRoute::class);
+        if (!empty($c_attributes)) {
+            $methods = $reflect->getMethods(\ReflectionMethod::IS_PUBLIC);
+            foreach ($methods as $method) {
+                $attributes = $method->getAttributes(MRoute::class);
+                if (!empty($attributes)) {
+                    foreach ($attributes as $attribute) {
+                        $args = $attribute->getArguments();
+                        $route = $args['route'] ?? $args[0] ?? null;
+                        if ($route) {
+                            $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
+                            $priority = $args['priority'] ?? $args[2] ?? 999;
+                            $protected = $args['protected'] ?? $args[3] ?? true;
+                            $route = new Route($route, $class, $method->getName(), $protected);
+                            $this->addRoute($http_method, $route, $priority);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public function addRoute(string $method, Route $route, int $priority = 999): void
     {
         $this->routes[strtoupper($method)][$priority][] = $route;
     }
 
-    /**
-     * Retrieves the Fully Qualified Class Name (FQCN) from a PHP file by parsing its contents.
-     *
-     * @param string $filepath The absolute or relative path to the PHP file to parse.
-     *
-     * @return string|false The FQCN of the class if found, otherwise false.
-     */
-    public function getFQCNFromFile(string $filepath): string|false
-    {
-        $namespace = null;
-        $class = null;
-        $contents = file_get_contents($filepath, length: $this->router_config->getFQCNFileDepth());
-        $tokens = token_get_all($contents);
-        $i = 0;
-        while ($i < count($tokens) && $i < 50) {
-            if (is_array($tokens[$i]) && $tokens[$i][0] === T_NAMESPACE) {
-                // Find the namespace declaration
-                $i++; //Move past the T_NAMESPACE
-                while (isset($tokens[$i]) && is_array($tokens[$i]) && $tokens[$i][0] === T_WHITESPACE) {
-                    $i++; // Skip Whitespace
-                }
-                $namespace = $tokens[$i][1];
-
-            } elseif (is_array($tokens[$i]) && $tokens[$i][0] === T_CLASS) {
-                // Find the class declaration
-                $i++; // Move past T_CLASS
-                while (isset($tokens[$i]) && is_array($tokens[$i]) && $tokens[$i][0] === T_WHITESPACE) {
-                    $i++; // Skip whitespace
-                }
-                $class = $tokens[$i][1];
-
-            }
-            $i++;
-            if (isset($namespace, $class)) {
-                return "\\$namespace\\$class";
-            }
-        }
-        return false;
-    }
 }

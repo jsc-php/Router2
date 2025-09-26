@@ -9,14 +9,14 @@ use JscPhp\Router2\MRoute;
 class Sample1
 {
     #[MRoute('/sample/view/:id|d/:test', 'get')]
-    public function view()
+    public function view($id, $test)
     {
-
+        var_dump($id, $test);
     }
 
     #[MRoute('/', 'get')]
     public function home_test()
     {
-
+        echo "Hello World\n";
     }
 }

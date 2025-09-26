@@ -8,6 +8,10 @@ $router_config->addPath(__DIR__ . '/classes');
 
 $router = new \JscPhp\Router2\Router($router_config);
 
-var_dump($router);
+
+if ($router->getRoute('/sample/view/1234/abcd', 'get')) {
+    $router->go();
+}
+
 
 //var_dump($router->getRoute('/', 'get'));
