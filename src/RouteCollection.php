@@ -51,19 +51,60 @@ class RouteCollection
      */
     public function processClassPaths(array $paths): void
     {
+        $namespace = '';
         foreach ($paths as $path) {
+            [$class_path, $sub_path] = $path;
+            $class_path = trim($class_path, '/');
+            $sub_path = trim($sub_path, '/');
+            $path = "/$class_path";
+            if (!empty($sub_path)) {
+                $path .= "/$sub_path";
+            }
             if (is_dir($path)) {
                 $di = new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS);
                 $files = new RecursiveIteratorIterator($di);
                 foreach ($files as $file) {
                     $file_path = $file->getPathname();
-                    if ($class = $this->getCRouteNamespaceClass($file_path)) {
-                        //include_once $file_path;
-                        $this->processClass($class);
+                    if ($this->router_config->isDev()) {
+                        include_once $file_path;
+                    }
+                    $class = str_replace($class_path, '', $file_path);
+                    $class = str_replace(DIRECTORY_SEPARATOR, '\\', $class);
+                    $class = str_replace('.php', '', $class);
+                    $class = trim($class, '\\');
+                    $class = "\\$class";
+
+                    $reflect = new \ReflectionClass($class);
+                    $c_attributes = $reflect->getAttributes(CRoute::class);
+                    if (!empty($c_attributes)) {
+                        $methods = $reflect->getMethods(\ReflectionMethod::IS_PUBLIC);
+                        foreach ($methods as $method) {
+                            $attributes = $method->getAttributes(MRoute::class);
+                            if (!empty($attributes)) {
+                                foreach ($attributes as $attribute) {
+                                    $args = $attribute->getArguments();
+                                    $route = $args['route'] ?? $args[0] ?? null;
+                                    if ($route) {
+                                        $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
+                                        $priority = $args['priority'] ?? $args[2] ?? 999;
+                                        $protected = $args['protected'] ?? $args[3] ?? true;
+                                        $route = new Route($route, $class, $method->getName(), $protected);
+                                        $this->addRoute($http_method, $route, $priority);
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
             }
         }
+    }
+
+    public
+    function addRoute(string $method, Route $route, int $priority = 999): void
+    {
+        $this->routes[strtoupper($method)][$priority][] = $route;
     }
 
     /**
@@ -76,7 +117,7 @@ class RouteCollection
      *                      if found and annotated with #[CRoute], or false if no such
      *                      class or annotation is found or the file is unreadable.
      */
-    public function getCRouteNamespaceClass(string $file_path): string|false
+    public function getCRouteNamespace(string $file_path): string|false
     {
         try {
             $namespace = null;
@@ -86,27 +127,16 @@ class RouteCollection
                 $handle = fopen($file_path, 'r');
                 $i = 0;
                 while (($line = fgets($handle)) && ($i < 50)) {
-
-                    if (preg_match('/^namespace\s+([^\s]+)/', $line, $matches)) {
+                    if (str_starts_with($line, 'namespace')) {
+                        preg_match('/^namespace\s+([^\s]+)/', $line, $matches);
                         $namespace = trim($matches[1], ';');
-                    }
-                    if (preg_match('/^class\s+([^\s]+)/', $line, $matches)) {
-                        $class = $matches[1];
-                    }
-                    if (preg_match('/^#\[CRoute]/', $line)) {
-                        $c_route = true;
-                    }
-                    if (isset($namespace, $class)) {
                         break;
                     }
                     $i++;
                 }
-
                 //var_dump($namespace, $class, $c_route);
                 fclose($handle);
-                if ($c_route) {
-                    return "\\$namespace\\$class";
-                }
+                return "\\$namespace";
             }
             return false;
         } catch (\Exception $ex) {
@@ -121,7 +151,8 @@ class RouteCollection
      * @return void
      * @throws \ReflectionException
      */
-    public function processClass(string $class): void
+    public
+    function processClass(string $class): void
     {
         $reflect = new \ReflectionClass($class);
         $c_attributes = $reflect->getAttributes(CRoute::class);
@@ -144,11 +175,6 @@ class RouteCollection
                 }
             }
         }
-    }
-
-    public function addRoute(string $method, Route $route, int $priority = 999): void
-    {
-        $this->routes[strtoupper($method)][$priority][] = $route;
     }
 
 }
