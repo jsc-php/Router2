@@ -13,7 +13,7 @@ class Router
         $this->router_config = $router_config;
         $this->route_collection = new RouteCollection($router_config);
         if (!empty($paths = $this->router_config->getPaths())) {
-            $this->route_collection->processClassPaths($paths, $this->router_config->getFQCNFileDepth());
+            $this->route_collection->processClassPaths($paths);
         }
     }
 

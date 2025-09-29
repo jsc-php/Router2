@@ -87,7 +87,7 @@ class RouteCollection
                                     if ($route) {
                                         $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
                                         $priority = $args['priority'] ?? $args[2] ?? 999;
-                                        $protected = $args['protected'] ?? $args[3] ?? true;
+                                        $protected = $args['protected'] ?? $args[3] ?? $this->router_config->isProtectDefault();
                                         $route = new Route($route, $class, $method->getName(), $protected);
                                         $this->addRoute($http_method, $route, $priority);
                                     }

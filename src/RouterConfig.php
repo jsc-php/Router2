@@ -4,12 +4,22 @@ namespace JscPhp\Router2;
 class RouterConfig
 {
     private array $paths           = [];
-    private int   $fqcn_file_depth = 1000;
-
+    private bool  $protect_default = false;
     private bool $dev = false;
 
     public function __construct()
     {
+    }
+
+    public function isProtectDefault(): bool
+    {
+        return $this->protect_default;
+    }
+
+    public function setProtectDefault(bool $protect_default): RouterConfig
+    {
+        $this->protect_default = $protect_default;
+        return $this;
     }
 
     public function isDev(): bool
@@ -23,16 +33,6 @@ class RouterConfig
         return $this;
     }
 
-    public function getFQCNFileDepth(): int
-    {
-        return $this->fqcn_file_depth;
-    }
-
-    public function setFQCNFileDepth(int $fqcn_file_depth): RouterConfig
-    {
-        $this->fqcn_file_depth = $fqcn_file_depth;
-        return $this;
-    }
 
     public function addPath(string $class_path, string $sub_path = ''): void
     {
