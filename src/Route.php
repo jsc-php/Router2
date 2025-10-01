@@ -45,13 +45,14 @@ class Route
         $segments = explode('|', $part);
         $this->parameters[] = $segments[0];
         if (count($segments) === 1) {
-            return '([\w-]+)';
+            return '([^\/]+)';
         }
         return match ($segments[1]) {
-            'w', 'W', 's', 'S' => '([\w-]+)',
-            'd', 'D'           => '(\d+)',
-            '#', 'r', 'R'      => '([0-9.]+)',
-            default            => $segments[1]
+            'w', 'W', 'word', 'WORD'     => '([\w]+)',
+            's', 'S', 'string', 'STRING' => '([^\/]+)',
+            'd', 'D'                     => '(\d+)',
+            '#', 'r', 'R'                => '([0-9.]+)',
+            default                      => $segments[1]
         };
     }
 
