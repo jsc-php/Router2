@@ -48,8 +48,8 @@ class Route
             return '([^\/]+)';
         }
         return match ($segments[1]) {
-            'w', 'W', 'word', 'WORD'     => '([\w]+)',
             's', 'S', 'string', 'STRING' => '([^\/]+)',
+            'w', 'W', 'word', 'WORD'     => '([\w]+)',
             'd', 'D'                     => '(\d+)',
             '#', 'r', 'R'                => '([0-9.]+)',
             default                      => $segments[1]
