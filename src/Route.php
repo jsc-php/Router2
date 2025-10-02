@@ -47,12 +47,14 @@ class Route
         if (count($segments) === 1) {
             return '([^\/]+)';
         }
-        return match ($segments[1]) {
-            's', 'S', 'string', 'STRING' => '([^\/]+)',
-            'w', 'W', 'word', 'WORD'     => '([\w]+)',
-            'd', 'D'                     => '(\d+)',
-            '#', 'r', 'R'                => '([0-9.]+)',
-            default                      => $segments[1]
+        $match = strtolower($segments[1]);
+        return match ($match) {
+            's', 'string'       => '([^\/]+)',
+            'w', 'word'         => '([\w]+)',
+            'd', 'i', 'integer' => '(\d+)',
+            '#', 'r'            => '([0-9.]+)',
+            '$'                 => '([0-9.$]+)',
+            default             => '(' . $segments[1] . ')'
         };
     }
 
