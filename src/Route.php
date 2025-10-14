@@ -10,6 +10,7 @@ class Route
     private        $method;
     private array  $parameters;
     private array  $parameter_values;
+    private object $object_instance;
 
     public function __construct(string $route, $class = '', $method = '')
     {
@@ -17,6 +18,7 @@ class Route
         $this->class = $class;
         $this->method = $method;
         $this->regex_pattern = $this->_buildRegexPattern($route);
+        $this->object_instance = new $class();
     }
 
     private function _buildRegexPattern(string $route): string
@@ -56,70 +58,44 @@ class Route
         };
     }
 
+    public function getObjectInstance(): object
+    {
+        return $this->object_instance;
+    }
+
     public function getRegexPattern(): string
     {
         return $this->regex_pattern;
     }
 
-    public function setRegexPattern(string $regex_pattern): Route
-    {
-        $this->regex_pattern = $regex_pattern;
-        return $this;
-    }
 
     public function getRoute(): string
     {
         return $this->route;
     }
 
-    public function setRoute(string $route): Route
-    {
-        $this->route = $route;
-        return $this;
-    }
 
     public function getClass(): mixed
     {
         return $this->class;
     }
 
-    public function setClass(mixed $class): Route
-    {
-        $this->class = $class;
-        return $this;
-    }
 
     public function getMethod(): mixed
     {
         return $this->method;
     }
 
-    public function setMethod(mixed $method): Route
-    {
-        $this->method = $method;
-        return $this;
-    }
 
     public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function setParameters(array $parameters): Route
-    {
-        $this->parameters = $parameters;
-        return $this;
-    }
 
     public function getParameterValues(): array
     {
         return $this->parameter_values;
-    }
-
-    public function setParameterValues(array $parameter_values): Route
-    {
-        $this->parameter_values = $parameter_values;
-        return $this;
     }
 
 

@@ -22,9 +22,8 @@ class Router
         if (empty($this->route)) {
             $this->getRoute();
         }
-        $class = $this->route->getClass();
+        $class = $this->route->getObjectInstance();
         $method = $this->route->getMethod();
-        $class = new $class;
         $arguments = $this->route->getMethodArguments();
         call_user_func_array([$class, $method], $arguments);
     }
