@@ -89,11 +89,6 @@ class Route
         return $this;
     }
 
-    public function getFunction(): mixed
-    {
-        return $this->getMethod();
-    }
-
     public function getMethod(): mixed
     {
         return $this->method;
