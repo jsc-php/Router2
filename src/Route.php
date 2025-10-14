@@ -10,7 +10,6 @@ class Route
     private        $method;
     private array  $parameters;
     private array  $parameter_values;
-    private object $object_instance;
 
     public function __construct(string $route, $class = '', $method = '')
     {
@@ -18,7 +17,6 @@ class Route
         $this->class = $class;
         $this->method = $method;
         $this->regex_pattern = $this->_buildRegexPattern($route);
-        $this->object_instance = new $class();
     }
 
     private function _buildRegexPattern(string $route): string
@@ -58,10 +56,6 @@ class Route
         };
     }
 
-    public function getObjectInstance(): object
-    {
-        return $this->object_instance;
-    }
 
     public function getRegexPattern(): string
     {
