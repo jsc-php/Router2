@@ -87,8 +87,7 @@ class RouteCollection
                                     if ($route) {
                                         $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
                                         $priority = $args['priority'] ?? $args[2] ?? 999;
-                                        $protected = $args['protected'] ?? $args[3] ?? $this->router_config->isProtectDefault();
-                                        $route = new Route($route, $class, $method->getName(), $protected);
+                                        $route = new Route($route, $class, $method->getName());
                                         $this->addRoute($http_method, $route, $priority);
                                     }
                                 }
@@ -150,8 +149,7 @@ class RouteCollection
      * @return void
      * @throws \ReflectionException
      */
-    public
-    function processClass(string $class): void
+    public function processClass(string $class): void
     {
         $reflect = new \ReflectionClass($class);
         $c_attributes = $reflect->getAttributes(CRoute::class);
@@ -166,8 +164,7 @@ class RouteCollection
                         if ($route) {
                             $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
                             $priority = $args['priority'] ?? $args[2] ?? 999;
-                            $protected = $args['protected'] ?? $args[3] ?? true;
-                            $route = new Route($route, $class, $method->getName(), $protected);
+                            $route = new Route($route, $class, $method->getName());
                             $this->addRoute($http_method, $route, $priority);
                         }
                     }

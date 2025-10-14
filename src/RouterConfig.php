@@ -3,12 +3,24 @@
 namespace JscPhp\Router2;
 class RouterConfig
 {
-    private array $paths           = [];
-    private bool  $protect_default = false;
-    private bool $dev = false;
+    private array  $paths            = [];
+    private bool   $protect_default  = false;
+    private string $protect_redirect = '';
+    private bool   $dev              = false;
 
     public function __construct()
     {
+    }
+
+    public function getProtectRedirect(): string
+    {
+        return $this->protect_redirect;
+    }
+
+    public function setProtectRedirect(string $protect_redirect): RouterConfig
+    {
+        $this->protect_redirect = $protect_redirect;
+        return $this;
     }
 
     public function isProtectDefault(): bool

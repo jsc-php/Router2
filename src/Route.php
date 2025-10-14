@@ -10,14 +10,12 @@ class Route
     private        $method;
     private array  $parameters;
     private array  $parameter_values;
-    private bool   $protected = false;
 
-    public function __construct(string $route, $class = '', $method = '', bool $protected = false)
+    public function __construct(string $route, $class = '', $method = '')
     {
         $this->route = $route;
         $this->class = $class;
         $this->method = $method;
-        $this->protected = $protected;
         $this->regex_pattern = $this->_buildRegexPattern($route);
     }
 
@@ -124,16 +122,6 @@ class Route
         return $this;
     }
 
-    public function isProtected(): bool
-    {
-        return $this->protected;
-    }
-
-    public function setProtected(bool $protected): Route
-    {
-        $this->protected = $protected;
-        return $this;
-    }
 
     public function matchURI(string $uri): bool
     {

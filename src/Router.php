@@ -17,6 +17,18 @@ class Router
         }
     }
 
+    public function go()
+    {
+        if (empty($this->route)) {
+            $this->getRoute();
+        }
+        $class = $this->route->getClass();
+        $method = $this->route->getMethod();
+        $class = new $class;
+        $arguments = $this->route->getMethodArguments();
+        call_user_func_array([$class, $method], $arguments);
+    }
+
     public function getRoute(?string $uri = null, ?string $http_method = null): Route|null
     {
         if (empty($uri)) {
@@ -30,14 +42,5 @@ class Router
             return $route;
         }
         return null;
-    }
-
-    public function go()
-    {
-        $class = $this->route->getClass();
-        $method = $this->route->getMethod();
-        $class = new $class;
-        $arguments = $this->route->getMethodArguments();
-        call_user_func_array([$class, $method], $arguments);
     }
 }
