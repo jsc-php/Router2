@@ -20,9 +20,9 @@ class Router
         }
     }
 
-    public function getReflectionMethod(): ReflectionMethod
+    public function getReflectionMethod(): ReflectionMethod|false
     {
-        return $this->reflection_method;
+        return $this->reflection_method ?? false;
     }
 
     public function go()
