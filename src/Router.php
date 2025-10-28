@@ -2,11 +2,14 @@
 
 namespace JscPhp\Router2;
 
+use ReflectionMethod;
+
 class Router
 {
-    private RouterConfig    $router_config;
-    private RouteCollection $route_collection;
-    private Route           $route;
+    private RouterConfig     $router_config;
+    private RouteCollection  $route_collection;
+    private Route            $route;
+    private ReflectionMethod $reflection_method;
 
     public function __construct(RouterConfig $router_config)
     {
@@ -15,6 +18,11 @@ class Router
         if (!empty($paths = $this->router_config->getPaths())) {
             $this->route_collection->processClassPaths($paths);
         }
+    }
+
+    public function getReflectionMethod(): ReflectionMethod
+    {
+        return $this->reflection_method;
     }
 
     public function go()
@@ -39,6 +47,7 @@ class Router
         }
         if ($route = $this->route_collection->matchRoute($http_method, $uri)) {
             $this->route = $route;
+            $this->reflection_method = new ReflectionMethod($route->getClass(), $route->getMethod());
             return $route;
         }
         return null;
