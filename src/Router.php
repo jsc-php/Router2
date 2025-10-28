@@ -22,7 +22,7 @@ class Router
 
     public function getReflectionMethod(): ReflectionMethod|false
     {
-        return $this->reflection_method ?? false;
+        return (!empty($this->reflection_method)) ? $this->reflection_method : false;
     }
 
     public function go()
