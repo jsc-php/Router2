@@ -29,10 +29,7 @@ class Router
     {
 
         if (empty($this->route)) {
-            $this->getRoute();
-        }
-        if ($this->route === null) {
-            throw new \Exception('Route not found');
+            throw new \Exception('Call Router->GetRoute() first');
         }
         $class = $this->route->getClass();
         $method = $this->route->getMethod();
@@ -43,7 +40,7 @@ class Router
 
     }
 
-    public function getRoute(?string $uri = null, ?string $http_method = null): Route|false
+    public function getRoute(?string $uri = null, ?string $http_method = null): Route
     {
         if (empty($uri)) {
             $uri = Request::getRequestURI(true);
@@ -56,6 +53,6 @@ class Router
             $this->reflection_method = new ReflectionMethod($route->getClass(), $route->getMethod());
             return $route;
         }
-        return false;
+        throw new \Exception('Route not found');
     }
 }

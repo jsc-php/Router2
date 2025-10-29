@@ -85,7 +85,7 @@ class RouteCollection
                                     $args = $attribute->getArguments();
                                     $route = $args['route'] ?? $args[0] ?? null;
                                     if ($route) {
-                                        $http_method = strtoupper($args['method'] ?? $args[1] ?? 'get');
+                                        $http_method = strtoupper($args['htto_method'] ?? $args[1] ?? 'get');
                                         $priority = $args['priority'] ?? $args[2] ?? 999;
                                         $route = new Route($route, $class, $method->getName());
                                         $this->addRoute($http_method, $route, $priority);
